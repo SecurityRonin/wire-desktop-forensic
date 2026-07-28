@@ -1,0 +1,26 @@
+[package]
+name         = "wire-desktop-forensic"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description  = "Forensic anomaly analysis for Wire desktop (Electron) IndexedDB artifacts — recovers cleartext message metadata + deleted records and flags client-side-encrypted (unrecoverable) payloads and exposed attachment key material, emitting forensicnomicon findings"
+license.workspace = true
+authors      = ["Albert Hui <albert@securityronin.com>"]
+keywords     = ["forensics", "wire", "messenger", "dfir", "indexeddb"]
+categories   = ["parser-implementations"]
+repository.workspace = true
+homepage     = "https://github.com/SecurityRonin/wire-desktop-forensic"
+documentation = "https://docs.rs/wire-desktop-forensic"
+readme       = "README.md"
+
+[lib]
+name = "wire_desktop_forensic"
+path = "src/lib.rs"
+
+[dependencies]
+wire-desktop-core = { workspace = true }
+# The normalized report model the findings are emitted into.
+forensicnomicon = { workspace = true }
+
+[lints]
+workspace = true

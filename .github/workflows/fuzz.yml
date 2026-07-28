@@ -1,0 +1,31 @@
+name: fuzz
+
+on:
+  push:
+    paths:
+      - "wire-desktop-core/**"
+      - "wire-desktop-forensic/**"
+      - "fuzz/**"
+      - ".github/workflows/fuzz.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    # cargo-fuzz needs nightly (-Z sanitizer=address). RUSTUP_TOOLCHAIN overrides
+    # the repo's rust-toolchain.toml pin for every cargo/rustc call, including the
+    # build cargo-fuzz spawns.
+    env:
+      RUSTUP_TOOLCHAIN: nightly
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [fuzz_interpret_records, fuzz_forensic]
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: dtolnay/rust-toolchain@nightly
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked
+      - name: Smoke-run ${{ matrix.target }} (must not panic)
+        run: cargo fuzz run ${{ matrix.target }} -- -runs=100000 -max_len=8192

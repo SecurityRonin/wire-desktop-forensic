@@ -1,0 +1,10 @@
+# gitleaks configuration — extends the default ruleset and allowlists known
+# false positives (CI cache keys are not secrets).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "CI cache keys are not secrets"
+regexes = [
+  '''corpus-wire-v[0-9]+''',
+]

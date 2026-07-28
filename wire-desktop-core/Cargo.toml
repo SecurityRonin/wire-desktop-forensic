@@ -1,0 +1,28 @@
+[package]
+name         = "wire-desktop-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description  = "Wire desktop (Electron) messenger reader — interprets the Chromium IndexedDB-over-LevelDB Dexie object stores into typed Wire records (conversations, events, users, clients) and a timeline; surfaces client-side-encrypted message payloads as unrecoverable rather than fabricating plaintext"
+license.workspace = true
+authors      = ["Albert Hui <albert@securityronin.com>"]
+keywords     = ["forensics", "wire", "messenger", "indexeddb", "dfir"]
+categories   = ["parser-implementations"]
+repository.workspace = true
+homepage     = "https://github.com/SecurityRonin/wire-desktop-forensic"
+documentation = "https://docs.rs/wire-desktop-core"
+readme       = "README.md"
+
+[lib]
+name = "wire_desktop_core"
+path = "src/lib.rs"
+
+[dependencies]
+# KNOWLEDGE leaf: the Wire artifact spec (store paths, roles, encryption posture).
+forensicnomicon-core = { workspace = true }
+# Wave-2 reader: decoded IndexedDB (database, objectStore, key, V8 value) records.
+chromium-storage-indexeddb = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true
