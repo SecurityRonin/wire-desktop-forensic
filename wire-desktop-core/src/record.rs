@@ -146,11 +146,100 @@ impl WireRecord {
 }
 
 /// Interpret a slice of decoded IndexedDB records into a typed [`WireStore`].
+///
+/// Every record is passed through as a [`WireRecord`] (store, role, primary key,
+/// sequence, tombstone flag, and decode-state payload); per-store field
+/// extraction is applied by the `fill_*` handlers. A per-object-store summary is
+/// rolled up alongside.
 #[must_use]
 pub fn interpret_records(records: &[IndexedDbRecord]) -> WireStore {
-    // Scaffold: interpretation is filled in per record type (TDD cycles).
-    let _ = records;
-    WireStore::default()
+    let mut out = Vec::with_capacity(records.len());
+    let mut summaries: Vec<ObjectStoreSummary> = Vec::new();
+
+    for r in records {
+        let store = r.object_store.as_deref().unwrap_or("");
+        let wr = interpret_one(store, r);
+
+        if !store.is_empty() {
+            let enc = usize::from(wr.is_encrypted());
+            let del = usize::from(wr.deleted);
+            match summaries.iter_mut().find(|s| s.name == store) {
+                Some(sum) => {
+                    sum.records += 1;
+                    sum.encrypted_payloads += enc;
+                    sum.deleted += del;
+                }
+                None => summaries.push(ObjectStoreSummary {
+                    name: store.to_string(),
+                    kind: wr.kind,
+                    records: 1,
+                    encrypted_payloads: enc,
+                    deleted: del,
+                }),
+            }
+        }
+        out.push(wr);
+    }
+
+    WireStore {
+        object_stores: summaries,
+        records: out,
+    }
+}
+
+/// Interpret one decoded IndexedDB record into a [`WireRecord`].
+///
+/// Builds the base record (store, role, primary key, seq, tombstone flag,
+/// decode-state payload) then dispatches to the per-store field extractor.
+fn interpret_one(store: &str, r: &IndexedDbRecord) -> WireRecord {
+    let kind = WireRecordKind::from_store_name(store);
+    let mut wr = WireRecord {
+        store: store.to_string(),
+        kind,
+        primary_key: render_key(&r.key),
+        id: None,
+        conversation: None,
+        sender: None,
+        time: None,
+        message_type: None,
+        name: None,
+        text: None,
+        payload: base_payload(&r.value),
+        seq: r.seq,
+        deleted: r.deleted,
+    };
+
+    if let RecordValue::V8(v) = &r.value {
+        match kind {
+            WireRecordKind::Conversation => fill_conversation(&mut wr, v),
+            WireRecordKind::Event => fill_event(&mut wr, v),
+            WireRecordKind::User => fill_user(&mut wr, v),
+            WireRecordKind::Client => fill_client(&mut wr, v),
+            WireRecordKind::Unknown => {}
+        }
+    }
+
+    wr
+}
+
+/// Extract conversation metadata. (Filled in by the conversation TDD cycle.)
+fn fill_conversation(wr: &mut WireRecord, v: &V8Value) {
+    let _ = (wr, v);
+}
+
+/// Extract event metadata + message body. (Filled in by the event TDD cycles.)
+fn fill_event(wr: &mut WireRecord, v: &V8Value) {
+    let _ = (wr, v);
+}
+
+/// Extract user metadata. (Filled in by the user TDD cycle.)
+fn fill_user(wr: &mut WireRecord, v: &V8Value) {
+    let _ = (wr, v);
+}
+
+/// Extract client/device metadata. (Filled in by the client TDD cycle.)
+fn fill_client(wr: &mut WireRecord, v: &V8Value) {
+    let _ = (wr, v);
 }
 
 /// The interpreted Wire store: a per-object-store summary plus every record.
