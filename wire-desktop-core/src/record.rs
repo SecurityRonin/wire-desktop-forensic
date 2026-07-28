@@ -301,9 +301,14 @@ fn fill_user(wr: &mut WireRecord, v: &V8Value) {
     wr.name = obj_field(v, "name").and_then(as_text);
 }
 
-/// Extract client/device metadata. (Filled in by the client TDD cycle.)
+/// Extract client/device metadata: the client `id` and a device label (the
+/// `model`, falling back to the `class` or `label`).
 fn fill_client(wr: &mut WireRecord, v: &V8Value) {
-    let _ = (wr, v);
+    wr.id = obj_field(v, "id").and_then(as_text);
+    wr.name = obj_field(v, "model")
+        .or_else(|| obj_field(v, "class"))
+        .or_else(|| obj_field(v, "label"))
+        .and_then(as_text);
 }
 
 /// The interpreted Wire store: a per-object-store summary plus every record.
