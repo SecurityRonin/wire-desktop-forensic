@@ -561,6 +561,24 @@ mod tests {
     }
 
     #[test]
+    fn is_encrypted_payload_covers_top_level_and_marker_paths() {
+        // Bare ArrayBuffer value (top-level).
+        assert!(is_encrypted_payload(&V8Value::ArrayBuffer(vec![1, 2])));
+        // Top-level cipher-marker field.
+        let top_marker = V8Value::Object(vec![("otr".into(), V8Value::String("x".into()))]);
+        assert!(is_encrypted_payload(&top_marker));
+        // data.encrypted marker.
+        let nested = V8Value::Object(vec![(
+            "data".into(),
+            V8Value::Object(vec![("encrypted".into(), V8Value::Bool(true))]),
+        )]);
+        assert!(is_encrypted_payload(&nested));
+        // A plain cleartext object is not encrypted.
+        let plain = V8Value::Object(vec![("content".into(), V8Value::String("hi".into()))]);
+        assert!(!is_encrypted_payload(&plain));
+    }
+
+    #[test]
     fn interpret_skips_summary_for_unnamed_store() {
         // A record with no object_store name is still passed through, but not
         // counted in any object-store summary.

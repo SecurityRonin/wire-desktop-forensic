@@ -73,10 +73,12 @@ pub fn read_store(dir: &Path) -> Result<WireStore, WireError> {
 /// `~/Library/Application Support/Wire`). Returns
 /// [`WireError::StoreNotFound`] when the resolved store directory is absent.
 pub fn read_profile(base: &Path) -> Result<WireStore, WireError> {
+    // forensicnomicon-core always ships the Wire spec; the None arm is a
+    // defensive guard for a future catalog that drops it (cov:unreachable).
     let spec = wire_spec().ok_or_else(|| WireError::StoreNotFound {
-        base: base.display().to_string(),
-        relative: "<Wire spec missing>".to_string(),
-    })?;
+        base: base.display().to_string(),            // cov:unreachable
+        relative: "<Wire spec missing>".to_string(), // cov:unreachable
+    })?; // cov:unreachable
     let relative = spec
         .store(StoreRole::Messages)
         .map_or("IndexedDB", |s| s.relative_path);
@@ -106,20 +108,47 @@ mod tests {
     #[test]
     fn read_profile_fails_loud_when_store_absent() {
         let tmp = std::env::temp_dir().join("wire-desktop-core-nonexistent-profile-xyz");
-        match read_profile(&tmp) {
-            Err(WireError::StoreNotFound { relative, .. }) => {
-                assert!(relative.contains(".indexeddb.leveldb"));
-            }
-            other => panic!("expected StoreNotFound, got {other:?}"),
+        let err = read_profile(&tmp).expect_err("absent store must fail loud");
+        assert!(matches!(err, WireError::StoreNotFound { .. }));
+        assert!(err.to_string().contains(".indexeddb.leveldb"));
+    }
+
+    #[test]
+    fn read_profile_reads_a_store_at_the_spec_relative_path() {
+        // Lay out a profile whose Messages-store relative path (from the Wire
+        // spec) contains the committed minted store, and read it end to end.
+        let spec = wire_spec().expect("spec");
+        let relative = spec
+            .store(StoreRole::Messages)
+            .expect("messages")
+            .relative_path;
+
+        let base = std::env::temp_dir().join(format!("wire-profile-{}", std::process::id()));
+        let dest = base.join(relative);
+        std::fs::create_dir_all(&dest).expect("mkdir profile store");
+        let src = std::path::PathBuf::from(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../tests/data/wire-indexeddb/http_127.0.0.1_8731.indexeddb.leveldb"
+        ));
+        for entry in std::fs::read_dir(&src).expect("read fixture dir") {
+            let entry = entry.expect("entry");
+            std::fs::copy(entry.path(), dest.join(entry.file_name())).expect("copy fixture file");
         }
+
+        let store = read_profile(&base).expect("read_profile happy path");
+        assert!(store
+            .records
+            .iter()
+            .any(|r| r.text.as_deref() == Some("meet at 9")));
+
+        std::fs::remove_dir_all(&base).ok();
     }
 
     #[test]
     fn read_store_surfaces_reader_errors() {
         let missing = std::env::temp_dir().join("wire-desktop-core-no-such-store-dir");
-        match read_store(&missing) {
-            Err(WireError::Read { path, .. }) => assert!(path.contains("no-such-store-dir")),
-            other => panic!("expected a Read error, got {other:?}"),
-        }
+        let err = read_store(&missing).expect_err("missing dir must error");
+        assert!(matches!(err, WireError::Read { .. }));
+        assert!(err.to_string().contains("no-such-store-dir"));
     }
 }
