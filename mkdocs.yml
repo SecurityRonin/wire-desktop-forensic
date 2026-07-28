@@ -1,0 +1,39 @@
+site_name: wire-desktop-forensic
+site_url: https://securityronin.github.io/wire-desktop-forensic/
+site_description: >-
+  Wire desktop (Electron) messenger IndexedDB reader + forensic analyzer —
+  interpret the Chromium Dexie object stores into typed Wire records and a
+  timeline; recover cleartext metadata and deleted records; flag client-side
+  encrypted (unrecoverable) payloads without fabricating plaintext.
+repo_url: https://github.com/SecurityRonin/wire-desktop-forensic
+repo_name: SecurityRonin/wire-desktop-forensic
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: red
+  features:
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Purpose & Scope: PRD.md
+  - Validation: validation.md
+  - Decisions:
+      - ADR-0001 Reader/analyzer split: decisions/0001-reader-analyzer-split.md
+      - ADR-0002 Interpret over the Wave-2 IndexedDB reader: decisions/0002-interpret-over-wave2-indexeddb-reader.md
+      - ADR-0003 Encrypted payloads fail loud: decisions/0003-encrypted-payloads-fail-loud.md
+  - Privacy Policy: privacy.md
+  - Terms of Service: terms.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.superfences
+
+plugins:
+  - search
