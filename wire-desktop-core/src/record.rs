@@ -245,7 +245,36 @@ fn fill_event(wr: &mut WireRecord, v: &V8Value) {
     if let Some(text) = message_text(v) {
         wr.text = Some(text);
         wr.payload = PayloadState::Cleartext;
+    } else if is_encrypted_payload(v) {
+        // Wire message content is Proteus-encrypted client-side; its key is not
+        // in the Chromium OS Safe Storage, so we mark it unrecoverable rather
+        // than fabricate plaintext.
+        wr.payload = PayloadState::Encrypted {
+            scheme: "Proteus",
+            reason: "Wire message key is not held in the Chromium OS Safe Storage",
+        };
     }
+}
+
+/// Whether an event value carries an opaque/ciphered body with no cleartext.
+///
+/// General structural rule (not tied to any one fixture): a top-level or nested
+/// `data` [`V8Value::ArrayBuffer`], or a documented ciphertext-marker field
+/// (`cipher_text` / `cipherText` / `otr` / `encrypted`) at the top level or
+/// under `data`.
+fn is_encrypted_payload(v: &V8Value) -> bool {
+    const CIPHER_MARKERS: [&str; 4] = ["cipher_text", "cipherText", "otr", "encrypted"];
+
+    if matches!(v, V8Value::ArrayBuffer(_)) {
+        return true;
+    }
+    let data = obj_field(v, "data");
+    if matches!(data, Some(V8Value::ArrayBuffer(_))) {
+        return true;
+    }
+    CIPHER_MARKERS
+        .iter()
+        .any(|m| obj_field(v, m).is_some() || data.is_some_and(|d| obj_field(d, m).is_some()))
 }
 
 /// Extract a cleartext message body from an event value: the `content`/`text`
