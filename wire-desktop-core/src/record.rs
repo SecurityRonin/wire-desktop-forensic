@@ -295,9 +295,10 @@ fn message_text(v: &V8Value) -> Option<String> {
         .and_then(as_text)
 }
 
-/// Extract user metadata. (Filled in by the user TDD cycle.)
+/// Extract user metadata: the user `id` and the display `name`.
 fn fill_user(wr: &mut WireRecord, v: &V8Value) {
-    let _ = (wr, v);
+    wr.id = obj_field(v, "id").and_then(as_text);
+    wr.name = obj_field(v, "name").and_then(as_text);
 }
 
 /// Extract client/device metadata. (Filled in by the client TDD cycle.)
