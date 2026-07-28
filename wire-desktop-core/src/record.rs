@@ -359,7 +359,6 @@ pub struct ObjectStoreSummary {
 // ─── value helpers (shared by the per-store fill_* handlers) ─────────────────
 
 /// Render an [`IdbKey`] to a stable text form for the record's `primary_key`.
-#[allow(dead_code)]
 pub(crate) fn render_key(key: &IdbKey) -> String {
     match key {
         IdbKey::String(s) => s.clone(),
@@ -375,7 +374,6 @@ pub(crate) fn render_key(key: &IdbKey) -> String {
     }
 }
 
-#[allow(dead_code)]
 fn hex(bytes: &[u8]) -> String {
     let mut s = String::with_capacity(bytes.len() * 2);
     for b in bytes {
@@ -386,7 +384,6 @@ fn hex(bytes: &[u8]) -> String {
 }
 
 /// A record value that decoded to a V8 object; `None` for non-objects.
-#[allow(dead_code)]
 pub(crate) fn obj_field<'a>(v: &'a V8Value, key: &str) -> Option<&'a V8Value> {
     match v {
         V8Value::Object(kv) => kv.iter().find(|(k, _)| k == key).map(|(_, val)| val),
@@ -395,7 +392,6 @@ pub(crate) fn obj_field<'a>(v: &'a V8Value, key: &str) -> Option<&'a V8Value> {
 }
 
 /// Render a scalar V8 value to text; `None` for containers/binary.
-#[allow(dead_code)]
 pub(crate) fn as_text(v: &V8Value) -> Option<String> {
     match v {
         V8Value::String(s) | V8Value::StringObject(s) | V8Value::BigInt(s) => Some(s.clone()),
@@ -407,7 +403,6 @@ pub(crate) fn as_text(v: &V8Value) -> Option<String> {
 }
 
 /// The decode-state of a record value, independent of its object-store role.
-#[allow(dead_code)]
 pub(crate) fn base_payload(value: &RecordValue) -> PayloadState {
     match value {
         RecordValue::V8(_) => PayloadState::Cleartext,
