@@ -507,6 +507,7 @@ dependencies = [
 name = "wire-desktop-forensic"
 version = "0.1.0"
 dependencies = [
+ "chromium-storage-indexeddb",
  "forensicnomicon",
  "wire-desktop-core",
 ]

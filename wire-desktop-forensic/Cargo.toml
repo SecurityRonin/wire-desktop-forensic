@@ -22,5 +22,11 @@ wire-desktop-core = { workspace = true }
 # The normalized report model the findings are emitted into.
 forensicnomicon = { workspace = true }
 
+[dev-dependencies]
+# Tests build decoded IndexedDB records and interpret them via wire-desktop-core
+# to obtain a WireStore to audit (WireRecord is #[non_exhaustive], so the only
+# construction path is through the reader).
+chromium-storage-indexeddb = { workspace = true }
+
 [lints]
 workspace = true
