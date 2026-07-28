@@ -222,9 +222,12 @@ fn interpret_one(store: &str, r: &IndexedDbRecord) -> WireRecord {
     wr
 }
 
-/// Extract conversation metadata. (Filled in by the conversation TDD cycle.)
+/// Extract conversation metadata: the conversation id (its own `id`) and the
+/// display `name`.
 fn fill_conversation(wr: &mut WireRecord, v: &V8Value) {
-    let _ = (wr, v);
+    wr.id = obj_field(v, "id").and_then(as_text);
+    wr.conversation = wr.id.clone();
+    wr.name = obj_field(v, "name").and_then(as_text);
 }
 
 /// Extract event metadata + message body. (Filled in by the event TDD cycles.)
