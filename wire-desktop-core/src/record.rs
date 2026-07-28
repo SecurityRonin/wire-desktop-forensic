@@ -230,9 +230,40 @@ fn fill_conversation(wr: &mut WireRecord, v: &V8Value) {
     wr.name = obj_field(v, "name").and_then(as_text);
 }
 
-/// Extract event metadata + message body. (Filled in by the event TDD cycles.)
+/// Extract event metadata (conversation, sender, time, type) and, when the body
+/// is in cleartext, the message text. Encrypted-payload classification is added
+/// by the encrypted-event cycle.
 fn fill_event(wr: &mut WireRecord, v: &V8Value) {
-    let _ = (wr, v);
+    wr.id = obj_field(v, "id").and_then(as_text);
+    wr.conversation = obj_field(v, "conversation").and_then(as_text);
+    wr.sender = obj_field(v, "from")
+        .or_else(|| obj_field(v, "sender"))
+        .and_then(as_text);
+    wr.time = obj_field(v, "time").and_then(as_text);
+    wr.message_type = obj_field(v, "type").and_then(as_text);
+
+    if let Some(text) = message_text(v) {
+        wr.text = Some(text);
+        wr.payload = PayloadState::Cleartext;
+    }
+}
+
+/// Extract a cleartext message body from an event value: the `content`/`text`
+/// field of the nested `data` object, or a top-level `content`/`text` field.
+/// Returns `None` when no cleartext body is present (e.g. an encrypted or a
+/// pure-system event).
+fn message_text(v: &V8Value) -> Option<String> {
+    if let Some(data) = obj_field(v, "data") {
+        if let Some(t) = obj_field(data, "content")
+            .or_else(|| obj_field(data, "text"))
+            .and_then(as_text)
+        {
+            return Some(t);
+        }
+    }
+    obj_field(v, "content")
+        .or_else(|| obj_field(v, "text"))
+        .and_then(as_text)
 }
 
 /// Extract user metadata. (Filled in by the user TDD cycle.)
