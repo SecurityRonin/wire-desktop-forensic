@@ -89,3 +89,37 @@ pub fn read_profile(base: &Path) -> Result<WireStore, WireError> {
     }
     read_store(&dir)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wire_spec_resolves_from_knowledge_leaf() {
+        let spec = wire_spec().expect("Wire spec present in forensicnomicon-core");
+        assert_eq!(spec.app, "Wire");
+        // The Messages store path is the IndexedDB LevelDB directory.
+        let msgs = spec.store(StoreRole::Messages).expect("messages store");
+        assert!(msgs.relative_path.contains(".indexeddb.leveldb"));
+    }
+
+    #[test]
+    fn read_profile_fails_loud_when_store_absent() {
+        let tmp = std::env::temp_dir().join("wire-desktop-core-nonexistent-profile-xyz");
+        match read_profile(&tmp) {
+            Err(WireError::StoreNotFound { relative, .. }) => {
+                assert!(relative.contains(".indexeddb.leveldb"));
+            }
+            other => panic!("expected StoreNotFound, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn read_store_surfaces_reader_errors() {
+        let missing = std::env::temp_dir().join("wire-desktop-core-no-such-store-dir");
+        match read_store(&missing) {
+            Err(WireError::Read { path, .. }) => assert!(path.contains("no-such-store-dir")),
+            other => panic!("expected a Read error, got {other:?}"),
+        }
+    }
+}

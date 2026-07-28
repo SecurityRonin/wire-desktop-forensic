@@ -411,3 +411,172 @@ pub(crate) fn base_payload(value: &RecordValue) -> PayloadState {
         },
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::WireError;
+
+    #[test]
+    fn render_key_covers_every_idbkey_variant() {
+        assert_eq!(render_key(&IdbKey::String("k".into())), "k");
+        assert_eq!(render_key(&IdbKey::Number(3.0)), "3");
+        assert_eq!(render_key(&IdbKey::Date(5.0)), "5");
+        assert_eq!(render_key(&IdbKey::Binary(vec![0xab, 0x0f])), "0xab0f");
+        assert_eq!(render_key(&IdbKey::Null), "null");
+        assert_eq!(render_key(&IdbKey::Min), "min");
+        assert_eq!(render_key(&IdbKey::Invalid(vec![0x01])), "invalid:0x01");
+        assert_eq!(
+            render_key(&IdbKey::Array(vec![
+                IdbKey::String("a".into()),
+                IdbKey::Number(1.0)
+            ])),
+            "[a,1]"
+        );
+    }
+
+    #[test]
+    fn as_text_covers_scalar_and_container_variants() {
+        assert_eq!(as_text(&V8Value::String("s".into())).as_deref(), Some("s"));
+        assert_eq!(
+            as_text(&V8Value::StringObject("o".into())).as_deref(),
+            Some("o")
+        );
+        assert_eq!(as_text(&V8Value::BigInt("9".into())).as_deref(), Some("9"));
+        assert_eq!(as_text(&V8Value::Int(7)).as_deref(), Some("7"));
+        assert_eq!(as_text(&V8Value::Double(2.0)).as_deref(), Some("2"));
+        assert_eq!(as_text(&V8Value::Date(4.0)).as_deref(), Some("4"));
+        assert_eq!(as_text(&V8Value::NumberObject(6.0)).as_deref(), Some("6"));
+        assert_eq!(as_text(&V8Value::Bool(true)).as_deref(), Some("true"));
+        assert_eq!(as_text(&V8Value::Null), None);
+        assert_eq!(as_text(&V8Value::Array(vec![])), None);
+    }
+
+    #[test]
+    fn obj_field_returns_none_for_non_objects_and_missing_keys() {
+        assert!(obj_field(&V8Value::Null, "x").is_none());
+        let o = V8Value::Object(vec![("a".into(), V8Value::Int(1))]);
+        assert!(obj_field(&o, "missing").is_none());
+        assert!(obj_field(&o, "a").is_some());
+    }
+
+    #[test]
+    fn base_payload_maps_decode_state() {
+        assert_eq!(
+            base_payload(&RecordValue::V8(V8Value::Null)),
+            PayloadState::Cleartext
+        );
+        let u = RecordValue::Undecoded {
+            raw: vec![0xff],
+            error: "boom".into(),
+        };
+        assert!(matches!(base_payload(&u), PayloadState::Undecoded { .. }));
+    }
+
+    #[test]
+    fn kind_mapping_and_labels() {
+        assert_eq!(
+            WireRecordKind::from_store_name("conversations"),
+            WireRecordKind::Conversation
+        );
+        assert_eq!(
+            WireRecordKind::from_store_name("events"),
+            WireRecordKind::Event
+        );
+        assert_eq!(
+            WireRecordKind::from_store_name("users"),
+            WireRecordKind::User
+        );
+        assert_eq!(
+            WireRecordKind::from_store_name("clients"),
+            WireRecordKind::Client
+        );
+        assert_eq!(
+            WireRecordKind::from_store_name("keys"),
+            WireRecordKind::Unknown
+        );
+        for k in [
+            WireRecordKind::Conversation,
+            WireRecordKind::Event,
+            WireRecordKind::User,
+            WireRecordKind::Client,
+            WireRecordKind::Unknown,
+        ] {
+            assert!(!k.as_str().is_empty());
+        }
+    }
+
+    fn rec(payload: PayloadState, text: Option<&str>) -> WireRecord {
+        WireRecord {
+            store: "events".into(),
+            kind: WireRecordKind::Event,
+            primary_key: "k".into(),
+            id: None,
+            conversation: None,
+            sender: None,
+            time: None,
+            message_type: None,
+            name: None,
+            text: text.map(str::to_string),
+            payload,
+            seq: 0,
+            deleted: false,
+        }
+    }
+
+    #[test]
+    fn decrypted_text_returns_or_fails_loud_per_payload() {
+        assert_eq!(
+            rec(PayloadState::Cleartext, Some("hi"))
+                .decrypted_text()
+                .unwrap(),
+            "hi"
+        );
+        // Cleartext with no text yields an empty body, not an error.
+        assert_eq!(
+            rec(PayloadState::Cleartext, None).decrypted_text().unwrap(),
+            ""
+        );
+        let enc = rec(
+            PayloadState::Encrypted {
+                scheme: "Proteus",
+                reason: "no key",
+            },
+            None,
+        );
+        assert!(matches!(
+            enc.decrypted_text(),
+            Err(WireError::EncryptedPayloadUnrecoverable)
+        ));
+        let und = rec(
+            PayloadState::Undecoded {
+                error: "bad".into(),
+            },
+            None,
+        );
+        assert!(matches!(
+            und.decrypted_text(),
+            Err(WireError::UndecodedValue(_))
+        ));
+    }
+
+    #[test]
+    fn interpret_skips_summary_for_unnamed_store() {
+        // A record with no object_store name is still passed through, but not
+        // counted in any object-store summary.
+        let r = IndexedDbRecord {
+            database_id: 0,
+            object_store_id: 0,
+            database: None,
+            object_store: None,
+            key: IdbKey::Null,
+            value: RecordValue::V8(V8Value::Null),
+            seq: 0,
+            deleted: false,
+        };
+        let store = interpret_records(&[r]);
+        assert_eq!(store.records.len(), 1);
+        assert!(store.object_stores.is_empty());
+        assert!(store.records_in("").next().is_some());
+    }
+}

@@ -92,6 +92,25 @@ fn flags_present_otr_key_material() {
 }
 
 #[test]
+fn encrypted_event_without_conversation_or_time_still_flags() {
+    // Exercises the empty-evidence path (no conversation, no time).
+    let recs = vec![record(
+        "events",
+        "ev-bare",
+        obj(vec![
+            ("type", s("conversation.otr-message-add")),
+            ("data", V8Value::ArrayBuffer(vec![0x00])),
+        ]),
+    )];
+    let f = audit_store(&interpret_records(&recs));
+    let enc = f
+        .iter()
+        .find(|x| x.code == "WIRE-MESSAGE-ENCRYPTED-UNRECOVERABLE")
+        .expect("encrypted finding");
+    assert!(enc.evidence.is_empty());
+}
+
+#[test]
 fn clean_store_yields_no_findings_of_note() {
     let empty = interpret_records(&[record("users", "u1", obj(vec![("id", s("u1"))]))]);
     let f = audit_store(&empty);
