@@ -2,7 +2,3 @@
 
 # Claude Code worktree / session data — never part of the repo
 /.claude/
-
-# Extracted / minted working copies of test data are ephemeral (see
-# tests/data/README.md). Only committed small fixtures live under tests/data/.
-/tests/data/wire-indexeddb/*.leveldb/
