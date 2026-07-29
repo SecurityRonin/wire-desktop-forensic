@@ -25,4 +25,4 @@ doc  = false
 libfuzzer-sys = "0.4"
 wire-desktop-core = { path = "../wire-desktop-core" }
 wire-desktop-forensic = { path = "../wire-desktop-forensic" }
-chromium-storage-indexeddb = { path = "../../chromium-storage-forensic/chromium-storage-indexeddb" }
+chromium-storage-indexeddb = "0.1"

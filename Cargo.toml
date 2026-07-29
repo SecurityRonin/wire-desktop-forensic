@@ -15,21 +15,19 @@ license      = "Apache-2.0"
 repository   = "https://github.com/SecurityRonin/wire-desktop-forensic"
 
 # Single source of truth for dependency versions (DRY): declare each once; members
-# write `dep.workspace = true`. Fleet crates use `version + path` so the local
-# checkout builds while the semver requirement stays honest (no wildcard) and
-# consumers get the registry version once each is published. Switch to
-# registry-only once every Wave-1/2 output is on crates.io.
+# write `dep.workspace = true`. Fleet dependencies resolve from crates.io by
+# registry caret; only internal workspace members keep a `path` dep.
 [workspace.dependencies]
 wire-desktop-core = { path = "wire-desktop-core", version = "0.1.0" }
 # KNOWLEDGE leaf: the Wire messenger artifact spec (store paths, roles, encryption
 # posture) — REUSE its constants, never re-hardcode a path or a store role here.
-forensicnomicon-core = { version = "1", path = "../../knowledge/forensicnomicon/crates/core" }
+forensicnomicon-core = "1.5"
 # The normalized report model (`forensicnomicon::report`) the analyzer emits into.
-forensicnomicon = { version = "1", path = "../../knowledge/forensicnomicon" }
+forensicnomicon = "1"
 # Wave-2 storage reader: Chromium IndexedDB-over-LevelDB → decoded
 # (database, objectStore, key, V8 value) records, incl. tombstones. Wire's
 # Dexie object stores are read through this — we never touch raw LevelDB.
-chromium-storage-indexeddb = { version = "0.1", path = "../chromium-storage-forensic/chromium-storage-indexeddb" }
+chromium-storage-indexeddb = "0.1"
 thiserror = "2"
 
 # Paranoid Gatekeeper: these crates interpret untrusted, attacker-controllable
