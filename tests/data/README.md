@@ -28,7 +28,10 @@ tier discussion.
 - **License / redistribution:** self-generated, no third-party rights; CC0-equivalent.
 - **Consumed by:** `wire-desktop-core/tests/oracle_minted.rs` (tier-2 oracle) —
   reads the store via `chromium_storage_indexeddb::read_dir`, interprets it, and
-  reconciles against the known writes.
+  reconciles against the known writes; and
+  `wire-desktop-core/tests/differential_ccl.rs` (tier-1 differential, env-gated
+  on `CCL_WIRE_ORACLE`) — reconciles the same decode against the independent
+  `ccl_chromium_reader` reading the identical bytes.
 - **Ground truth (the known writes):**
   - `conversations/conv-1` → name `Incident Ops`
   - `events/conv-1@ev-1` → cleartext `meet at 9`, from `user-alice`,

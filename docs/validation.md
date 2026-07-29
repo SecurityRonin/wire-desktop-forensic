@@ -31,8 +31,42 @@ at the reader-output seam) are **tier-3** structural checks layered under it.
    `tests/data/wire-indexeddb/` and read back through
    `chromium-storage-indexeddb` in `wire-desktop-core/tests/oracle_minted.rs`.
 
-**Reported validation tier: T2.** The bytes are Chromium/Blink-authored (not
-self-encoded), but the Wire-schema scenario was constructed by us.
+**Reported validation tier: T2** for the minted-store correctness assertions,
+**T1** for the differential below. The bytes are Chromium/Blink-authored (not
+self-encoded); the Wire-schema scenario was constructed by us, but the decode is
+independently cross-checked against a third-party reader.
+
+## Differential against ccl_chromium_reader (tier 1)
+
+The Chromium IndexedDB-over-LevelDB decode our reader consumes is reconciled,
+record-for-record, against the independent third-party reader
+[`cclgroupltd/ccl_chromium_reader`](https://github.com/cclgroupltd/ccl_chromium_reader)
+reading the **same** committed minted store. Two independent implementations of
+the hard part — the LevelDB key coding scheme plus the Blink/V8
+`SerializedScriptValue` value deserialization — agreeing on the same bytes is
+tier-1 evidence: the answer key is authored by someone else, not by us. (The
+Wire *schema* field mapping — which JSON field is the sender, where the message
+body lives — is shared documented knowledge applied to each side's own decode;
+the byte-level decode is what the differential cross-checks.)
+
+`wire-desktop-core/tests/differential_ccl.rs` decodes the store with
+`read_store`, shells out to `tests/ccl_oracle.py` (which drives ccl's
+`ccl_chromium_indexeddb` over the identical directory), and asserts three sets
+match exactly: the live `(store, key, kind)` records, every interpreted
+`(store, key, field, value)`, and the encrypted-record set. On the committed
+minted store all three reconcile (6 records: `conversations`/`events`/`users`/
+`clients`/`keys`, the `meet at 9` cleartext body, and the `ArrayBuffer` event
+classified encrypted by both).
+
+It is **env-gated on `CCL_WIRE_ORACLE`** (a Python interpreter that can
+`from ccl_chromium_reader import ccl_chromium_indexeddb`, with the clone on
+`PYTHONPATH`); unset ⇒ clean skip, so CI without the oracle stays green. Set
+`CCL_WIRE_DIR` to point the differential at a different Chromium IndexedDB store.
+
+```bash
+PYTHONPATH=/path/to/ccl_chromium_reader CCL_WIRE_ORACLE=$(which python3) \
+    cargo test -p wire-desktop-core --test differential_ccl
+```
 
 ## What the tier-2 oracle checks
 
@@ -66,16 +100,16 @@ independent oracle. They sit **below** the tier-2 minted store.
   arbitrary bytes; smoke-run locally at 20,000 runs each with no crash, and CI
   runs 100k/target on nightly. Invariant: never panic.
 
-## What would upgrade this
+## What would upgrade this further
 
-- **Tier-1:** a real Wire desktop profile captured from an actual installation
-  (or a published third-party DFIR sample with ground truth). Reconcile the
-  interpreted records against an independent parser — `ccl_chrome_indexeddb` or
-  Google's [`dfindexeddb`](https://github.com/google/dfindexeddb) — over the same
-  store, and compare object-store contents record-for-record.
-- **Cross-tool differential:** run `dfindexeddb` on the committed minted store and
-  reconcile its record dump against this reader's output (an independent oracle
-  over the same bytes), even before a real corpus is available.
+- **Real Wire corpus:** a real Wire desktop profile captured from an actual
+  installation (or a published third-party DFIR sample with ground truth) would
+  upgrade the *scenario* from self-constructed to real, running the same ccl
+  differential over genuine Wire app output rather than a minted store.
+- **A second independent oracle:** Google's
+  [`dfindexeddb`](https://github.com/google/dfindexeddb) over the same bytes,
+  reconciled the same way, would add a second cross-check alongside ccl.
 
-Neither is claimed today; the current, honestly-labelled evidence is tier-2 over
-Chromium-authored bytes plus tier-3 structural fixtures.
+The current, honestly-labelled evidence is a **tier-1 differential** against
+`ccl_chromium_reader` (independent decoder, same bytes) over a tier-2
+Chromium-authored minted store, plus tier-3 structural fixtures under it.
