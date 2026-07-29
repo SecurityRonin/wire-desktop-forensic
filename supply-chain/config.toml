@@ -16,8 +16,6 @@ url = "https://raw.githubusercontent.com/google/rust-crate-audits/main/audits.to
 [imports.mozilla]
 url = "https://raw.githubusercontent.com/mozilla/supply-chain/main/audits.toml"
 
-# Our own published crates are first-party — audit them as workspace source, not as
-# a per-version crates.io audit (otherwise every release bump reddens the vet gate).
 [policy.wire-desktop-core]
 audit-as-crates-io = false
 
