@@ -21,7 +21,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@21dc36fb71dd22e3317045c0c31a3f4249868b17 # stable
         with:
           toolchain: 1.96.0
-      - uses: release-plz/action@acb96e5cb7ef958ba717b0c22f8ad7e2ffd3d20f # v0.5.108
+      - uses: release-plz/action@e8792575c7f2366cf6ff3ccc33ead9ace5b691c7 # v0.5.108
         with:
           command: release-pr
         env:
@@ -37,7 +37,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@21dc36fb71dd22e3317045c0c31a3f4249868b17 # stable
         with:
           toolchain: 1.96.0
-      - uses: release-plz/action@acb96e5cb7ef958ba717b0c22f8ad7e2ffd3d20f # v0.5.108
+      - uses: release-plz/action@e8792575c7f2366cf6ff3ccc33ead9ace5b691c7 # v0.5.108
         with:
           command: release
         env:
