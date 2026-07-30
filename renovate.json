@@ -6,15 +6,43 @@
   ],
   "packageRules": [
     {
-      "matchManagers": ["github-actions"],
+      "matchManagers": [
+        "github-actions"
+      ],
       "automerge": true,
       "automergeType": "pr",
-      "matchUpdateTypes": ["digest", "patch", "minor"]
+      "matchUpdateTypes": [
+        "digest",
+        "patch",
+        "minor"
+      ]
     },
     {
-      "matchManagers": ["cargo"],
+      "matchManagers": [
+        "cargo"
+      ],
       "automerge": true,
-      "matchUpdateTypes": ["patch", "minor"]
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ]
     }
-  ]
+  ],
+  "minimumReleaseAge": "21 days",
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 2,
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "minimumReleaseAge": null,
+    "labels": [
+      "security"
+    ],
+    "prPriority": 10
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 5am on the first day of the month"
+    ]
+  }
 }
