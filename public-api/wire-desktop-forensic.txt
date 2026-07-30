@@ -1,0 +1,22 @@
+pub mod wire_desktop_forensic
+pub enum wire_desktop_forensic::AnomalyKind
+pub wire_desktop_forensic::AnomalyKind::CleartextMessage
+pub wire_desktop_forensic::AnomalyKind::CleartextMessage::conversation: core::option::Option<alloc::string::String>
+pub wire_desktop_forensic::AnomalyKind::CleartextMessage::sender: core::option::Option<alloc::string::String>
+pub wire_desktop_forensic::AnomalyKind::CleartextMessage::time: core::option::Option<alloc::string::String>
+pub wire_desktop_forensic::AnomalyKind::DeletedRecord
+pub wire_desktop_forensic::AnomalyKind::DeletedRecord::primary_key: alloc::string::String
+pub wire_desktop_forensic::AnomalyKind::DeletedRecord::store: alloc::string::String
+pub wire_desktop_forensic::AnomalyKind::EncryptedMessage
+pub wire_desktop_forensic::AnomalyKind::EncryptedMessage::conversation: core::option::Option<alloc::string::String>
+pub wire_desktop_forensic::AnomalyKind::EncryptedMessage::time: core::option::Option<alloc::string::String>
+pub wire_desktop_forensic::AnomalyKind::OtrKeyPresent
+pub wire_desktop_forensic::AnomalyKind::OtrKeyPresent::primary_key: alloc::string::String
+pub wire_desktop_forensic::AnomalyKind::OtrKeyPresent::store: alloc::string::String
+impl wire_desktop_forensic::AnomalyKind
+pub fn wire_desktop_forensic::AnomalyKind::category(&self) -> forensicnomicon_core::report::Category
+pub fn wire_desktop_forensic::AnomalyKind::code(&self) -> &'static str
+pub fn wire_desktop_forensic::AnomalyKind::note(&self) -> alloc::string::String
+pub fn wire_desktop_forensic::AnomalyKind::severity(&self) -> forensicnomicon_core::report::Severity
+pub const wire_desktop_forensic::ANALYZER: &str
+pub fn wire_desktop_forensic::audit_store(&wire_desktop_core::record::WireStore) -> alloc::vec::Vec<forensicnomicon_core::report::Finding>

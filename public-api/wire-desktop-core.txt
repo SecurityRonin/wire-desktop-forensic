@@ -1,0 +1,68 @@
+pub mod wire_desktop_core
+#[non_exhaustive] pub enum wire_desktop_core::PayloadState
+pub wire_desktop_core::PayloadState::Cleartext
+pub wire_desktop_core::PayloadState::Encrypted
+pub wire_desktop_core::PayloadState::Encrypted::reason: &'static str
+pub wire_desktop_core::PayloadState::Encrypted::scheme: &'static str
+pub wire_desktop_core::PayloadState::Undecoded
+pub wire_desktop_core::PayloadState::Undecoded::error: alloc::string::String
+#[non_exhaustive] pub enum wire_desktop_core::WireError
+pub wire_desktop_core::WireError::EncryptedPayloadUnrecoverable
+pub wire_desktop_core::WireError::Read
+pub wire_desktop_core::WireError::Read::detail: alloc::string::String
+pub wire_desktop_core::WireError::Read::path: alloc::string::String
+pub wire_desktop_core::WireError::StoreNotFound
+pub wire_desktop_core::WireError::StoreNotFound::base: alloc::string::String
+pub wire_desktop_core::WireError::StoreNotFound::relative: alloc::string::String
+pub wire_desktop_core::WireError::UndecodedValue(alloc::string::String)
+#[non_exhaustive] pub enum wire_desktop_core::WireRecordKind
+pub wire_desktop_core::WireRecordKind::Client
+pub wire_desktop_core::WireRecordKind::Conversation
+pub wire_desktop_core::WireRecordKind::Event
+pub wire_desktop_core::WireRecordKind::Unknown
+pub wire_desktop_core::WireRecordKind::User
+impl wire_desktop_core::WireRecordKind
+pub fn wire_desktop_core::WireRecordKind::as_str(&self) -> &'static str
+pub fn wire_desktop_core::WireRecordKind::from_store_name(&str) -> wire_desktop_core::WireRecordKind
+#[non_exhaustive] pub struct wire_desktop_core::ObjectStoreSummary
+pub wire_desktop_core::ObjectStoreSummary::deleted: usize
+pub wire_desktop_core::ObjectStoreSummary::encrypted_payloads: usize
+pub wire_desktop_core::ObjectStoreSummary::kind: wire_desktop_core::WireRecordKind
+pub wire_desktop_core::ObjectStoreSummary::name: alloc::string::String
+pub wire_desktop_core::ObjectStoreSummary::records: usize
+#[non_exhaustive] pub struct wire_desktop_core::TimelineEntry
+pub wire_desktop_core::TimelineEntry::conversation: core::option::Option<alloc::string::String>
+pub wire_desktop_core::TimelineEntry::deleted: bool
+pub wire_desktop_core::TimelineEntry::message_type: core::option::Option<alloc::string::String>
+pub wire_desktop_core::TimelineEntry::payload: wire_desktop_core::PayloadState
+pub wire_desktop_core::TimelineEntry::sender: core::option::Option<alloc::string::String>
+pub wire_desktop_core::TimelineEntry::time: alloc::string::String
+#[non_exhaustive] pub struct wire_desktop_core::WireRecord
+pub wire_desktop_core::WireRecord::conversation: core::option::Option<alloc::string::String>
+pub wire_desktop_core::WireRecord::deleted: bool
+pub wire_desktop_core::WireRecord::id: core::option::Option<alloc::string::String>
+pub wire_desktop_core::WireRecord::kind: wire_desktop_core::WireRecordKind
+pub wire_desktop_core::WireRecord::message_type: core::option::Option<alloc::string::String>
+pub wire_desktop_core::WireRecord::name: core::option::Option<alloc::string::String>
+pub wire_desktop_core::WireRecord::payload: wire_desktop_core::PayloadState
+pub wire_desktop_core::WireRecord::primary_key: alloc::string::String
+pub wire_desktop_core::WireRecord::sender: core::option::Option<alloc::string::String>
+pub wire_desktop_core::WireRecord::seq: u64
+pub wire_desktop_core::WireRecord::store: alloc::string::String
+pub wire_desktop_core::WireRecord::text: core::option::Option<alloc::string::String>
+pub wire_desktop_core::WireRecord::time: core::option::Option<alloc::string::String>
+impl wire_desktop_core::WireRecord
+pub fn wire_desktop_core::WireRecord::decrypted_text(&self) -> core::result::Result<&str, wire_desktop_core::WireError>
+pub fn wire_desktop_core::WireRecord::is_encrypted(&self) -> bool
+#[non_exhaustive] pub struct wire_desktop_core::WireStore
+pub wire_desktop_core::WireStore::object_stores: alloc::vec::Vec<wire_desktop_core::ObjectStoreSummary>
+pub wire_desktop_core::WireStore::records: alloc::vec::Vec<wire_desktop_core::WireRecord>
+impl wire_desktop_core::WireStore
+pub fn wire_desktop_core::WireStore::encrypted_events(&self) -> impl core::iter::traits::iterator::Iterator<Item = &wire_desktop_core::WireRecord>
+pub fn wire_desktop_core::WireStore::events(&self) -> impl core::iter::traits::iterator::Iterator<Item = &wire_desktop_core::WireRecord>
+pub fn wire_desktop_core::WireStore::records_in<'a>(&'a self, &'a str) -> impl core::iter::traits::iterator::Iterator<Item = &'a wire_desktop_core::WireRecord>
+pub fn wire_desktop_core::interpret_records(&[chromium_storage_indexeddb::IndexedDbRecord]) -> wire_desktop_core::WireStore
+pub fn wire_desktop_core::read_profile(&std::path::Path) -> core::result::Result<wire_desktop_core::WireStore, wire_desktop_core::WireError>
+pub fn wire_desktop_core::read_store(&std::path::Path) -> core::result::Result<wire_desktop_core::WireStore, wire_desktop_core::WireError>
+pub fn wire_desktop_core::timeline(&wire_desktop_core::WireStore) -> alloc::vec::Vec<wire_desktop_core::TimelineEntry>
+pub fn wire_desktop_core::wire_spec() -> core::option::Option<&'static forensicnomicon_core::messenger_desktop::MessengerSpec>
