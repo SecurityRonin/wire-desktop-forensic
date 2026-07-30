@@ -61,10 +61,29 @@ CHROME_PID=$!; sleep 8; kill -TERM $CHROME_PID   # clean shutdown flushes leveld
 # fixture = $MINT/profile/Default/IndexedDB/http_127.0.0.1_8731.indexeddb.leveldb
 ```
 
-The full HTML/JS is in the git history of `docs/validation.md` / the minting
-commit. The origin is `http_127.0.0.1_8731` purely because the page was served
+**There is no committed mint script for this repo** (unlike
+`whatsapp-desktop-forensic/scripts/mint/mint.sh`): the `index.html` that performs the
+writes is described in prose above, with the full HTML/JS in the git history of
+`docs/validation.md` / the minting commit. The reproducible record is therefore the
+ground-truth write list above plus these commands — re-minting means re-authoring the
+page from that list, not re-running a script.
+
+The origin is `http_127.0.0.1_8731` purely because the page was served
 from `127.0.0.1:8731`; a real Wire profile's origin is `https_app.wire.com_0` —
 the reader is origin-agnostic, so this does not affect interpretation.
+
+### Env gates
+
+| Env var | Purpose |
+|---|---|
+| `WIRE_MINTED_DIR` | point `oracle_minted.rs` at a freshly minted store instead of the committed one |
+| `CCL_WIRE_ORACLE` | a Python interpreter that can `import ccl_chromium_reader`; unset ⇒ the tier-1 differential skips |
+| `CCL_WIRE_DIR` | optional — run the differential over a different store dir |
+
+```sh
+PYTHONPATH=/path/to/ccl_chromium_reader CCL_WIRE_ORACLE=$(which python3) \
+    cargo test -p wire-desktop-core --test differential_ccl
+```
 
 ### MD5 manifest
 
