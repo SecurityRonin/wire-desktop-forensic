@@ -34,7 +34,7 @@ jobs:
       CRATES: "wire-desktop-core wire-desktop-forensic"
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - uses: dtolnay/rust-toolchain@21dc36fb71dd22e3317045c0c31a3f4249868b17 # stable
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
       - name: Install nightly (cargo-public-api needs rustdoc JSON)
         run: rustup toolchain install "$NIGHTLY" --profile minimal
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
