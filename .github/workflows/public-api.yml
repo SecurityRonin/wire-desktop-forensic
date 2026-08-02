@@ -21,16 +21,22 @@ jobs:
   public-api:
     runs-on: ubuntu-latest
     env:
-      # Pin the tool so its textual output format is stable across CI runs (matches
-      # the version used to generate the committed baselines).
+      # The committed baselines are only reproducible if BOTH inputs are pinned.
+      # cargo-public-api renders from rustdoc JSON, so the nightly that produces
+      # that JSON decides the output text just as much as the tool version does:
+      # a floating nightly rewrote `std::io::error::Error` to `core::io::error::Error`
+      # and reddened this gate on an API that had not changed at all.
+      # Bumping NIGHTLY is therefore a deliberate act that regenerates the
+      # baselines in the same commit -- never one without the other.
       CARGO_PUBLIC_API_VERSION: "0.52.0"
+      NIGHTLY: "nightly-2026-05-12"
       OMIT: "blanket-impls,auto-trait-impls,auto-derived-impls"
       CRATES: "wire-desktop-core wire-desktop-forensic"
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: dtolnay/rust-toolchain@21dc36fb71dd22e3317045c0c31a3f4249868b17 # stable
       - name: Install nightly (cargo-public-api needs rustdoc JSON)
-        run: rustup toolchain install nightly --profile minimal
+        run: rustup toolchain install "$NIGHTLY" --profile minimal
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
       - name: Install cargo-public-api
         run: cargo install cargo-public-api --locked --version "$CARGO_PUBLIC_API_VERSION"
@@ -39,7 +45,7 @@ jobs:
           fail=0
           for crate in $CRATES; do
             echo "::group::$crate"
-            cargo public-api -p "$crate" --all-features --omit "$OMIT" > "/tmp/$crate.txt"
+            cargo "+$NIGHTLY" public-api -p "$crate" --all-features --omit "$OMIT" > "/tmp/$crate.txt"
             if ! diff -u "public-api/$crate.txt" "/tmp/$crate.txt"; then
               echo "::error::Public API of $crate changed. If intentional, regenerate the baseline in this PR:"
               echo "  cargo public-api -p $crate --all-features --omit $OMIT > public-api/$crate.txt"
