@@ -5,7 +5,7 @@ members = ["wire-desktop-core", "wire-desktop-forensic"]
 # Single source of truth for fields shared by every member (DRY): bump version /
 # MSRV / license here once; members inherit via `field.workspace = true`.
 [workspace.package]
-version      = "0.1.0"
+version      = "0.1.1"
 edition      = "2021"
 # MSRV floor is set by the transitive `blob-decoder` (via chromium-storage-indexeddb),
 # which needs 1.88 for the V8/Blink structured-clone decoder. The analysis layer
