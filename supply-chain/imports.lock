@@ -16,29 +16,29 @@ user-login = "fitzgen"
 user-name = "Nick Fitzgerald"
 
 [[publisher.chromium-storage-indexeddb]]
-version = "0.1.0"
-when = "2026-07-29"
+version = "0.1.1"
+when = "2026-08-04"
 user-id = 347968
 user-login = "h4x0r"
 user-name = "Albert Hui"
 
 [[publisher.forensicnomicon]]
-version = "1.9.0"
-when = "2026-07-29"
+version = "1.11.0"
+when = "2026-08-05"
 user-id = 347968
 user-login = "h4x0r"
 user-name = "Albert Hui"
 
 [[publisher.forensicnomicon-core]]
-version = "1.5.0"
-when = "2026-07-29"
+version = "1.5.1"
+when = "2026-08-05"
 user-id = 347968
 user-login = "h4x0r"
 user-name = "Albert Hui"
 
 [[publisher.forensicnomicon-data]]
-version = "1.3.3"
-when = "2026-07-29"
+version = "1.4.0"
+when = "2026-08-05"
 user-id = 347968
 user-login = "h4x0r"
 user-name = "Albert Hui"
