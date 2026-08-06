@@ -46,9 +46,9 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
 name = "chromium-storage-indexeddb"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d7389093964ad42d256ebe8d6521c6db90b36c88246ea2cc732ac2847504afd"
+checksum = "d564d07869b11f4ef3650034d1434139a0cff3d774a677860c24a13e8a7970bb"
 dependencies = [
  "blob-decoder",
  "forensicnomicon-core",
@@ -98,9 +98,9 @@ dependencies = [
 
 [[package]]
 name = "forensicnomicon"
-version = "1.9.0"
+version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "627d1273075d569b64ff7ff8a452fc1c8594790f9d3b07dc1ca0b27b9bb0f7e8"
+checksum = "2d07251e3b2a97b12e224efc9f77076b4ea65e4fc1fde60b3b67e567b242ee19"
 dependencies = [
  "forensicnomicon-core",
  "forensicnomicon-data",
@@ -108,15 +108,15 @@ dependencies = [
 
 [[package]]
 name = "forensicnomicon-core"
-version = "1.5.0"
+version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21800c5e29085274fbb324be30790894481c9c5faf8c659b3d0d994840ca0941"
+checksum = "7eb783b79792587a65eb4fb0aeff41b471b44659fbacfe15f61d3685c122a889"
 
 [[package]]
 name = "forensicnomicon-data"
-version = "1.3.3"
+version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fc507e10461af6be7ab1404347be31995453005aad4382d9edde5a8c4556486"
+checksum = "78a2c24ccad1150609546fbe85ad466e2cf24443fdac13e32297acb4ef913c28"
 dependencies = [
  "forensicnomicon-core",
 ]
@@ -419,9 +419,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.54"
+version = "0.3.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e1d5e639ff6bab73cb6885cc7e7b1de96c3f32c68ec55f3952614bec1092244"
+checksum = "cdb87b95ec50ddfa440816d227a17b2ccbdda963a316a727fda0fc4334f7d134"
 dependencies = [
  "deranged",
  "num-conv",
@@ -510,7 +510,7 @@ dependencies = [
 
 [[package]]
 name = "wire-desktop-core"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "chromium-storage-indexeddb",
  "forensicnomicon-core",
@@ -519,7 +519,7 @@ dependencies = [
 
 [[package]]
 name = "wire-desktop-forensic"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "chromium-storage-indexeddb",
  "forensicnomicon",
