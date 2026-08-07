@@ -19,3 +19,23 @@ jobs:
   # a behaviour change smuggled in by an adoption PR, so there is nothing here.
   ci:
     uses: SecurityRonin/fleet-ci/.github/workflows/rust-ci.yml@a62ab10603151071744cec0b4e3638aa6406d4e4
+    with:
+      # MIGRATION DEBT, with the reason stated because neither half of the old
+      # gate survives intact.
+      #
+      # SCOPE: the replaced job ran `cargo llvm-cov --all-features` without
+      # --workspace, i.e. this package only. `coverage-scope` offers `workspace`
+      # or `lib` — there is no package-only value — so the scope necessarily
+      # widens, and line coverage reads 99.27% instead of the 100% the old gate
+      # saw. The floor sits just under the measured value so it still holds the
+      # line; it is not slack.
+      #
+      # FUNCTIONS: the old gate also required 100% FUNCTION coverage. The shared
+      # workflow has no function-coverage input, so that half is dropped. That is
+      # a genuine reduction, recorded here rather than left to be discovered.
+      #
+      # REMOVE WHEN: the widened scope reaches 100% lines and this repo can
+      # inherit `coverage-gate: strict`. Restoring the function gate needs an
+      # input that does not exist yet.
+      coverage-gate: floor
+      coverage-floor: 99
