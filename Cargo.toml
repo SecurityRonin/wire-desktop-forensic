@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["wire-desktop-core", "wire-desktop-forensic"]
+members = ["core", "forensic"]
 
 # Single source of truth for fields shared by every member (DRY): bump version /
 # MSRV / license here once; members inherit via `field.workspace = true`.
@@ -18,7 +18,7 @@ repository   = "https://github.com/SecurityRonin/wire-desktop-forensic"
 # write `dep.workspace = true`. Fleet dependencies resolve from crates.io by
 # registry caret; only internal workspace members keep a `path` dep.
 [workspace.dependencies]
-wire-desktop-core = { path = "wire-desktop-core", version = "0.1.0" }
+wire-desktop-core = { path = "core", version = "0.1.0" }
 # KNOWLEDGE leaf: the Wire messenger artifact spec (store paths, roles, encryption
 # posture) — REUSE its constants, never re-hardcode a path or a store role here.
 forensicnomicon-core = "1.5"

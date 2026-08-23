@@ -29,7 +29,7 @@ at the reader-output seam) are **tier-3** structural checks layered under it.
    conversation with a name, and an `otr_key` record. The resulting
    `…indexeddb.leveldb` directory is committed under
    `tests/data/wire-indexeddb/` and read back through
-   `chromium-storage-indexeddb` in `wire-desktop-core/tests/oracle_minted.rs`.
+   `chromium-storage-indexeddb` in `core/tests/oracle_minted.rs`.
 
 **Reported validation tier: T2** for the minted-store correctness assertions,
 **T1** for the differential below. The bytes are Chromium/Blink-authored (not
@@ -49,7 +49,7 @@ Wire *schema* field mapping — which JSON field is the sender, where the messag
 body lives — is shared documented knowledge applied to each side's own decode;
 the byte-level decode is what the differential cross-checks.)
 
-`wire-desktop-core/tests/differential_ccl.rs` decodes the store with
+`core/tests/differential_ccl.rs` decodes the store with
 `read_store`, shells out to `tests/ccl_oracle.py` (which drives ccl's
 `ccl_chromium_indexeddb` over the identical directory), and asserts three sets
 match exactly: the live `(store, key, kind)` records, every interpreted
@@ -85,7 +85,7 @@ The mint recipe (verbatim commands + the origin caveat) is in
 
 ## Tier-3 structural fixtures (under the oracle)
 
-`wire-desktop-core/tests/*.rs` and the in-module unit tests build
+`core/tests/*.rs` and the in-module unit tests build
 `IndexedDbRecord`s at the reader-output seam to exercise each record type,
 encryption classification, the timeline, and the analyzer. These are
 self-authored fixtures *and* expected answers — legitimate, fast, deterministic

@@ -23,6 +23,6 @@ doc  = false
 
 [dependencies]
 libfuzzer-sys = "0.4"
-wire-desktop-core = { path = "../wire-desktop-core" }
-wire-desktop-forensic = { path = "../wire-desktop-forensic" }
+wire-desktop-core = { path = "../core" }
+wire-desktop-forensic = { path = "../forensic" }
 chromium-storage-indexeddb = "0.1"
