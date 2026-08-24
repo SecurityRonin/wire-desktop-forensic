@@ -26,10 +26,10 @@ tier discussion.
   Windows OS* — <https://velog.io/@hunjison/Forensic-Analysis-of-Wire-Messenger-in-Windows-OS>
   (the `https_app.wire.com_0.indexeddb.leveldb` store + the `otr_key`).
 - **License / redistribution:** self-generated, no third-party rights; CC0-equivalent.
-- **Consumed by:** `wire-desktop-core/tests/oracle_minted.rs` (tier-2 oracle) —
+- **Consumed by:** `core/tests/oracle_minted.rs` (tier-2 oracle) —
   reads the store via `chromium_storage_indexeddb::read_dir`, interprets it, and
   reconciles against the known writes; and
-  `wire-desktop-core/tests/differential_ccl.rs` (tier-1 differential, env-gated
+  `core/tests/differential_ccl.rs` (tier-1 differential, env-gated
   on `CCL_WIRE_ORACLE`) — reconciles the same decode against the independent
   `ccl_chromium_reader` reading the identical bytes.
 - **Ground truth (the known writes):**
